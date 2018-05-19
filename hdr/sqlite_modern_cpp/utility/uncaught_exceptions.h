@@ -4,6 +4,12 @@
 #include <exception>
 #include <iostream>
 
+#ifndef __cpp_lib_uncaught_exceptions
+#if __cplusplus >= 201703L
+#define __cpp_lib_uncaught_exceptions
+#endif
+#endif
+
 namespace sqlite {
 	namespace utility {
 #ifdef __cpp_lib_uncaught_exceptions
