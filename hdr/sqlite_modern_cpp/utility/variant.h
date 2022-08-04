@@ -161,7 +161,7 @@ namespace sqlite::utility {
 		using type = std::conditional_t<std::is_same_v<typename VariantFirstBlobable<T, Options...>::type, T>, std::unique_ptr<T>, typename VariantFirstBlobable<Options...>::type>;
 	};
 	template<typename T, typename A, typename ...Options>
-	struct VariantFirstBlobable<std::enable_if_t<std::is_pod_v<T>>, std::vector<T, A>, Options...> {
+	struct VariantFirstBlobable<std::enable_if_t<std::is_standard_layout_v<T>>, std::vector<T, A>, Options...> {
 		using type = std::vector<T, A>;
 	};
 	template<typename Callback, typename ...Options>
