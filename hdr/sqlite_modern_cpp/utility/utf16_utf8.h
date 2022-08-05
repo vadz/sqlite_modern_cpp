@@ -9,20 +9,24 @@
 namespace sqlite {
 	namespace utility {
 		inline std::string utf16_to_utf8(const std::u16string &input) {
-			struct : std::codecvt<char16_t, char, std::mbstate_t> {
+			// 'std::codecvt<char16_t, char, std::mbstate_t>' was deprecated in C++20.
+			// We will use 'char8_t' here.
+			struct : std::codecvt<char16_t, char8_t, std::mbstate_t> {
 			} codecvt;
 			std::mbstate_t state{};
-			std::string result((std::max)(input.size() * 3 / 2, std::size_t(4)), '\0');
+			std::u8string result((std::max)(input.size() * 3 / 2, std::size_t(4)), '\0');
 			const char16_t *remaining_input = input.data();
 			std::size_t produced_output = 0;
 			while(true) {
-				char *used_output;
+				char8_t *used_output;
 				switch(codecvt.out(state, remaining_input, &input[input.size()],
 				                   remaining_input, &result[produced_output],
 				                   &result[result.size() - 1] + 1, used_output)) {
 				case std::codecvt_base::ok:
 					result.resize(used_output - result.data());
-					return result;
+					// Cast 'std::u8string' to 'std::string' because we don't want to replace
+					// 'std::string' with 'std::u8string' in whole app.
+					return std::string(reinterpret_cast<const char*>(result.data()), result.size());
 				case std::codecvt_base::noconv:
 					// This should be unreachable
 				case std::codecvt_base::error:
